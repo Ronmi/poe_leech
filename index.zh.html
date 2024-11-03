@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>骸骨屏障計算器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="bone_barrier.js"></script>
+  </head>
+  <body>
+
+    <div class="container my-3">
+      <p class="mt-3">
+        <a href="index.html">English</a>
+      </p>
+      <p class="mt-3">
+        填入以下欄位，你可以在 POB 的 <strong>Calc</strong> 分頁 (或是 PoeCharm 的<strong>計算</strong>分頁) 找到必要的值。
+</p>
+<table class="table table-bordered align-middle">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>數值</th>
+      <th>說明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><label for="life" class="form-label">最大生命</label></td>
+      <td><input id="life" class="form-control" /></td>
+      <td>玩家的最大生命</td>
+    </tr>
+    <tr>
+      <td><label for="damage" class="form-label">平均傷害</label></td>
+      <td><input id="damage" class="form-control" /></td>
+      <td>
+        <a href="damage.png">POB 的這個欄位</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><label for="aps" class="form-label">攻擊速率</label></td>
+      <td><input id="aps" class="form-control" /></td>
+      <td>每秒攻擊或施法的次數</td>
+    </tr>
+    <tr>
+      <td><label for="hit_chance" class="form-label">命中率</label></td>
+      <td><input id="hit_chance" class="form-control" /></td>
+      <td>80% 的話，輸入 80</td>
+    </tr>
+    <tr>
+      <td><label for="mult" class="form-label">召喚物數量</label></td>
+      <td><input id="mult" class="form-control" /></td>
+      <td>此召喚物的數量，不是總數。例如你在看殭屍能提供的吸血量時，填入殭屍的數量就好</td>
+    </tr> 
+    <tr>
+      <td><label for="instant" class="form-label">立即偷取</label></td>
+      <td><input id="instant" class="form-control" /></td>
+      <td>偷取為立即的百分比。如果有點<strong>瓦爾冥約</strong>的話就填 100</td>
+    </tr> 
+    <tr>
+      <td><label for="max_rate" class="form-label">最大偷取率</label></td>
+      <td><input id="max_rate" class="form-control" /></td>
+      <td>
+        <a href="max_rate.png">POB 的這個欄位</a>.
+        你可以在 POB 新增一個攻擊或法術技能，連上 <strong>生命偷取</strong>，再切到計算分頁就能看到這個欄位。
+      </td>
+    </tr>
+    <tr>
+      <td><label for="mod" class="form-label">Leech rate modifier</label></td>
+      <td><input id="mod" class="form-control" /></td>
+      <td>
+        <p>
+          <a href="mod.png">POB 的這個欄位</a>.
+          你可以在 POB 新增一個攻擊或法術技能，連上 <strong>生命偷取</strong>，再切到計算分頁就能看到這個欄位。
+        </p>
+        <p>
+          如果找不到這個欄位，就填 1
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="leech_rate" class="form-label">偷取率</label></td>
+      <td><input id="leech_rate" class="form-control" value="1"/></td>
+      <td>% 傷害偷取為生命。以骸骨屏障來說，應該是 1</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="mt-3">
+  <button class="btn btn-primary" type="button" onclick="update_leech()">計算</button>
+</div>
+
+<div style="width:30em;max-width:100%">
+  <table class="mt-3 table table-responsive table-bordered align-middle caption-top">
+    <caption>以下是平均值</caption>
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th class="text-end">數值</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>每秒有效擊中數</td>
+        <td class="text-end" id="ehr"></td>
+      </tr>
+      <tr>
+        <td>平均擊中傷害</td>
+        <td class="text-end" id="hit"></td>
+      </tr>
+      <tr>
+        <td>每次命中的偷取上限</td>
+        <td class="text-end" id="cap"></td>
+      </tr>
+      <tr>
+        <td>每次命中的偷取量</td>
+        <td class="text-end" id="lpi"></td>
+      </tr>
+      <tr>
+        <td>每次命中偷取持續時間</td>
+        <td class="text-end" id="dur"></td>
+      </tr>
+      <tr>
+        <td>每次命中的立即偷取量</td>
+        <td class="text-end" id="ins"></td>
+      </tr>
+      <tr>
+        <td>每次命中的一般偷取量</td>
+        <td class="text-end" id="nlpi"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">每次命中的每秒偷取量上限</td>
+        <td class="text-end text-primary" id="lps"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">每秒偷取量上限</td>
+        <td class="text-end text-primary" id="total_lps"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">最多疊幾層</td>
+        <td class="text-end text-primary" id="count"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">每秒立即偷取量</td>
+        <td class="text-end text-danger" id="ips"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">每秒一般偷取量</td>
+        <td class="text-end text-danger" id="nps"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">總計每秒偷取量</td>
+        <td class="text-end text-danger" id="rate"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+</body>
+</html>

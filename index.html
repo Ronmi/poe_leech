@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bone Barrier Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="bone_barrier.js"></script>
+  </head>
+  <body>
+
+    <div class="container my-3">
+      <p class="mt-3">
+        <a href="index.zh.html">中文</a>
+      </p>
+      <p class="mt-3">
+        Fills following fields. Values can be found in POB <strong>Calc</string> tab.
+</p>
+<table class="table table-bordered align-middle">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><label for="life" class="form-label">Life</label></td>
+      <td><input id="life" class="form-control" /></td>
+      <td>Player maximum life.</td>
+    </tr>
+    <tr>
+      <td><label for="damage" class="form-label">Average Damage</label></td>
+      <td><input id="damage" class="form-control" /></td>
+      <td>
+        <a href="damage.png">This field in POB</a>.
+      </td>
+    </tr>
+    <tr>
+      <td><label for="aps" class="form-label">Attack/Cast Rate</label></td>
+      <td><input id="aps" class="form-control" /></td>
+      <td>Attack/Cast per second.</td>
+    </tr>
+    <tr>
+      <td><label for="hit_chance" class="form-label">Hit Chance</label></td>
+      <td><input id="hit_chance" class="form-control" /></td>
+      <td>In percent, fill 80 for 80% hit chance.</td>
+    </tr>
+    <tr>
+      <td><label for="mult" class="form-label">Number of specified minions</label></td>
+      <td><input id="mult" class="form-control" /></td>
+      <td>Do not mixing different kind of minions (like, spectre+zombie).</td>
+    </tr> 
+    <tr>
+      <td><label for="instant" class="form-label">Instant leech rate</label></td>
+      <td><input id="instant" class="form-control" /></td>
+      <td>% of leech is instant. For <strong>Vaal Pact</strong>, it's 100.</td>
+    </tr> 
+    <tr>
+      <td><label for="max_rate" class="form-label">Max leech rate</label></td>
+      <td><input id="max_rate" class="form-control" /></td>
+      <td>
+        <a href="max_rate.png">This field in POB</a>.
+        You can add an unused spell/attack skill, link it with <strong>Life Leech Support</strong>, and switch to <strong>Calc</strong> tab to see this field.
+      </td>
+    </tr>
+    <tr>
+      <td><label for="mod" class="form-label">Leech rate modifier</label></td>
+      <td><input id="mod" class="form-control" /></td>
+      <td>
+        <p>
+          <a href="mod.png">This field in POB</a>.
+          You can add an unused spell/attack skill, link it with <strong>Life Leech Support</strong>, and switch to <strong>Calc</strong> tab to see this field.
+        </p>
+        <p>
+          If you don't have this field, fill 1.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="leech_rate" class="form-label">Leech percent</label></td>
+      <td><input id="leech_rate" class="form-control" value="1"/></td>
+      <td>% of damage leeched, for Bone Barrier, it's 1.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="mt-3">
+  <button class="btn btn-primary" type="button" onclick="update_leech()">Calculate</button>
+</div>
+
+<div style="width:30em;max-width:100%">
+  <table class="mt-3 table table-responsive table-bordered align-middle caption-top">
+    <caption>Average values</caption>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th class="text-end">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Effective Hit Rate</td>
+        <td class="text-end" id="ehr"></td>
+      </tr>
+      <tr>
+        <td>Average Hit Damage</td>
+        <td class="text-end" id="hit"></td>
+      </tr>
+      <tr>
+        <td>Leech cap of one instance</td>
+        <td class="text-end" id="cap"></td>
+      </tr>
+      <tr>
+        <td>Leech amount per instance</td>
+        <td class="text-end" id="lpi"></td>
+      </tr>
+      <tr>
+        <td>Instance duration</td>
+        <td class="text-end" id="dur"></td>
+      </tr>
+      <tr>
+        <td>Instant leech per instance</td>
+        <td class="text-end" id="ins"></td>
+      </tr>
+      <tr>
+        <td>Non-instant leech per instance</td>
+        <td class="text-end" id="nlpi"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">Max leech per second per instance</td>
+        <td class="text-end text-primary" id="lps"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">Maximum Leech per second</td>
+        <td class="text-end text-primary" id="total_lps"></td>
+      </tr>
+      <tr>
+        <td class="text-primary">Number of instances</td>
+        <td class="text-end text-primary" id="count"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">Instant leech per second</td>
+        <td class="text-end text-danger" id="ips"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">Non-instant leech per second</td>
+        <td class="text-end text-danger" id="nps"></td>
+      </tr>
+      <tr>
+        <td class="text-danger">Leech per second</td>
+        <td class="text-end text-danger" id="rate"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+</body>
+</html>
